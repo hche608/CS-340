@@ -76,12 +76,14 @@ def top():
     """Move a runnable process to the top of the stack."""
     process = get_process_from_user("Enter the number of the process to move:")
     # ...
+    the_dispatcher.to_top(process)
     return False
 
 def kill():
     """Kill the process at the top of the stack."""
     process = get_process_from_user("Enter the number of the process to kill:")
     # ...
+    the_dispatcher.proc_finished(process)
     return False
 
 def halt():
@@ -100,7 +102,9 @@ def pause():
     input from a file you can allow the system to run for a time
     without new commands arriving.
     """
+    the_dispatcher.pause_system()
     sleep(5)
+    the_dispatcher.resume_system()
 
 def wait():
     """Wait until all runnable processes have finished."""
