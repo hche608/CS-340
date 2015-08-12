@@ -70,6 +70,8 @@ def focus():
     # only get here after the user has pressed return
     # put the data in the buffer of the process and wake it up
     # ...
+    io_system.fill_buffer(process,input)
+    process.event.set()
     return False
 
 def top():

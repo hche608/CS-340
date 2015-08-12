@@ -36,9 +36,7 @@ class Process(threading.Thread):
         # the state can be used to determine which list - runnable or waiting the process
         # appears in.
         # ...
-        self.state = State.waiting
-        if self.type == Type.background:
-            self.state = State.runnable
+        self.state = State.runnable
         self.event = threading.Event()
         
 
