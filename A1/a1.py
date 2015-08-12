@@ -102,9 +102,7 @@ def pause():
     input from a file you can allow the system to run for a time
     without new commands arriving.
     """
-    the_dispatcher.pause_system()
     sleep(5)
-    the_dispatcher.resume_system()
 
 def wait():
     """Wait until all runnable processes have finished."""
