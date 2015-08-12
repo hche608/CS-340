@@ -16,8 +16,7 @@ class Dispatcher():
         """Construct the dispatcher."""
         # ...
         self.runningStack = []
-        self.waitIndex = 0
-        self.waitingStack = []
+        self.waitingIndex = 0
 
     def set_io_sys(self, io_sys):
         """Set the io subsystem."""
@@ -29,24 +28,25 @@ class Dispatcher():
         if 0 < len(self.runningStack):
             self.pause_system()
         self.runningStack.append(process)
-        process.iosys.allocate_window_to_process(process, self.runningStack.index(process))
+        process.iosys.allocate_window_to_process(process, self.runningStack.index(process) - self.waitingIndex)
         process.start()
         self.dispatch_next_process()
 
     def dispatch_next_process(self):
         """Dispatch the process at the top of the stack."""
         # ...
-        if len(self.runningStack) > 0:
+        if len(self.runningStack) - self.waitingIndex > 0:
             self.runningStack[len(self.runningStack) - 1].event.set()
             
 
     def to_top(self, process):
         """Move the process to the top of the stack."""
         # ...
-        self.pause_system()
-        self.runningStack.remove(process)
-        self.runningStack.append(process)
-        self.resume_system()
+        if self.runningStack.index(process) >= waitingIndex:
+            self.pause_system()
+            self.runningStack.remove(process)
+            self.runningStack.append(process)
+            self.resume_system()
 
 
     def pause_system(self):
@@ -73,14 +73,15 @@ class Dispatcher():
         # ...
         process.state = State.killed
         process.iosys.remove_window_from_process(process)
-        if process in self.runningStack :        
+        if self.runningStack.index(process) >= self.waitingIndex :
             self.runningStack.remove(process)
-            for x in range(len(self.runningStack)):
-                self.io_sys.move_process(self.runningStack[x],x)
-        elif process in self.waitingStack:
-            self.waitingStack.remove(process)
-            for x in range(len(self.waitingStack)):
-                self.io_sys.move_process(self.waitingStack[x], x)
+            for x in range(self.waitingIndex, len(self.runningStack)):
+                self.io_sys.move_process(self.runningStack[x],x - self.waitingIndex)
+        elif process in self.runningStack:
+            self.waitingIndex = self.waitingIndex - 1
+            self.runningStack.remove(process)
+            for x in range(self.waitingIndex):
+                self.io_sys.move_process(self.runningStack[x], x)
         self.dispatch_next_process()
 
     def proc_waiting(self, process):
@@ -88,8 +89,9 @@ class Dispatcher():
         # ...
         self.runningStack.remove(process)
         process.state = State.waiting
-        self.waitingStack.append(process)
-        process.iosys.move_process(process, self.waitingStack.index(process))
+        self.runningStack.insert(0, process)
+        self.waitingIndex = self.waitingIndex + 1
+        process.iosys.move_process(process, self.waitingIndex - 1)
         process.event.clear()
         self.resume_system()
         
@@ -98,9 +100,6 @@ class Dispatcher():
         """Return the process with the id."""
         # ...
         for process in self.runningStack:
-            if process.id == id:
-                return process
-        for process in self.waitingStack:
             if process.id == id:
                 return process
         return None
