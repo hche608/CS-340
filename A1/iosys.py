@@ -93,12 +93,15 @@ class IO_Sys():
     def fill_buffer(self, process, data):
         """Fill the process buffer with data."""
         # ...
+        self.process_buffers[process] data
         
 
     def read(self, process):
         """Gets input from the window associated with 'process'."""
         # change the state of the process to waiting
         self.the_dispatcher.proc_waiting(process)
+        process.event.wait()
+        
         # ...
         return 1# return the data here
 

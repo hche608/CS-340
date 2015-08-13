@@ -16,7 +16,6 @@ class Dispatcher():
         """Construct the dispatcher."""
         # ...
         self.runningStack = []
-        self.waitIndex = 0
         self.waitingStack = []
 
     def set_io_sys(self, io_sys):
