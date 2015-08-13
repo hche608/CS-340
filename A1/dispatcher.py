@@ -7,6 +7,7 @@
 from threading import Lock, Event
 from process import State
 
+
 class Dispatcher():
     """The dispatcher."""
 
@@ -36,18 +37,16 @@ class Dispatcher():
         """Dispatch the process at the top of the stack."""
         # ...
         if len(self.runningStack) - self.waitingIndex > 0:
-            self.runningStack[len(self.runningStack) - 1].event.set()
-            
+            self.runningStack[len(self.runningStack) - 1].process_event.set()
 
     def to_top(self, process):
         """Move the process to the top of the stack."""
         # ...
-        if self.runningStack.index(process) >= waitingIndex:
+        if self.runningStack.index(process) >= self.waitingIndex:
             self.pause_system()
             self.runningStack.remove(process)
             self.runningStack.append(process)
             self.resume_system()
-
 
     def pause_system(self):
         """Pause the currently running process.
@@ -55,7 +54,7 @@ class Dispatcher():
         effectively pauses the system.
         """
         # ...
-        self.runningStack[len(self.runningStack) - 1].event.clear()
+        self.runningStack[len(self.runningStack) - 1].process_event.clear()
 
     def resume_system(self):
         """Resume running the system."""
@@ -73,12 +72,12 @@ class Dispatcher():
         # ...
         process.state = State.killed
         process.iosys.remove_window_from_process(process)
-        if self.runningStack.index(process) >= self.waitingIndex :
+        if self.runningStack.index(process) >= self.waitingIndex:
             self.runningStack.remove(process)
             for x in range(self.waitingIndex, len(self.runningStack)):
-                self.io_sys.move_process(self.runningStack[x],x - self.waitingIndex)
+                self.io_sys.move_process(self.runningStack[x], x - self.waitingIndex)
         elif process in self.runningStack:
-            self.waitingIndex = self.waitingIndex - 1
+            self.waitingIndex -= 1
             self.runningStack.remove(process)
             for x in range(self.waitingIndex):
                 self.io_sys.move_process(self.runningStack[x], x)
@@ -90,11 +89,9 @@ class Dispatcher():
         self.runningStack.remove(process)
         process.state = State.waiting
         self.runningStack.insert(0, process)
-        self.waitingIndex = self.waitingIndex + 1
-        process.iosys.move_process(process, self.waitingIndex - 1)
-        process.event.clear()
+        process.iosys.move_process(process, self.runningStack.index(process) - self.waitingIndex)
+        process.process_event.clear()
         self.resume_system()
-        
 
     def process_with_id(self, id):
         """Return the process with the id."""
@@ -103,4 +100,3 @@ class Dispatcher():
             if process.id == id:
                 return process
         return None
-

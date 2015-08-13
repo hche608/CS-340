@@ -13,6 +13,7 @@ from enum import Enum
 Type = Enum("Type", "background interactive")
 State = Enum("State", "runnable waiting killed")
 
+
 class Process(threading.Thread):
     """A process."""
 
@@ -37,8 +38,7 @@ class Process(threading.Thread):
         # appears in.
         # ...
         self.state = State.runnable
-        self.event = threading.Event()
-        
+        self.process_event = threading.Event()
 
     def run(self):
         """Start the process running."""
@@ -52,7 +52,7 @@ class Process(threading.Thread):
         """Run as an interactive process."""
         # Something like the following but you will have to think about
         # pausing and resuming the process.
-        self.event.wait()
+        self.process_event.wait()
         loops = self.ask_user()
         while loops > 0:
             for i in range(loops):
@@ -79,9 +79,8 @@ class Process(threading.Thread):
         # pausing and resuming the process.
 
         # check to see if supposed to terminate
-        self.event.wait()
+        self.process_event.wait()
         if self.state == State.killed:
             _thread.exit()
         self.iosys.write(self, "*")
         sleep(0.1)
-
