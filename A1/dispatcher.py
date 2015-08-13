@@ -17,7 +17,7 @@ class Dispatcher():
         """Construct the dispatcher."""
         # ...
         self.runningStack = []
-        self.waitingIndex = 0
+        self.waitingList = []
 
     def set_io_sys(self, io_sys):
         """Set the io subsystem."""
@@ -29,20 +29,20 @@ class Dispatcher():
         if 0 < len(self.runningStack):
             self.pause_system()
         self.runningStack.append(process)
-        process.iosys.allocate_window_to_process(process, self.runningStack.index(process) - self.waitingIndex)
+        process.iosys.allocate_window_to_process(process, self.runningStack.index(process))
         process.start()
         self.dispatch_next_process()
 
     def dispatch_next_process(self):
         """Dispatch the process at the top of the stack."""
         # ...
-        if len(self.runningStack) - self.waitingIndex > 0:
+        if len(self.runningStack) > 0:
             self.runningStack[len(self.runningStack) - 1].process_event.set()
 
     def to_top(self, process):
         """Move the process to the top of the stack."""
         # ...
-        if self.runningStack.index(process) >= self.waitingIndex:
+        if process in self.runningStack:
             self.pause_system()
             self.runningStack.remove(process)
             self.runningStack.append(process)
@@ -54,7 +54,8 @@ class Dispatcher():
         effectively pauses the system.
         """
         # ...
-        self.runningStack[len(self.runningStack) - 1].process_event.clear()
+        if len(self.runningStack) > 0:
+            self.runningStack[len(self.runningStack) - 1].process_event.clear()
 
     def resume_system(self):
         """Resume running the system."""
@@ -72,24 +73,24 @@ class Dispatcher():
         # ...
         process.state = State.killed
         process.iosys.remove_window_from_process(process)
-        if self.runningStack.index(process) >= self.waitingIndex:
+        if process in self.runningStack:
             self.runningStack.remove(process)
-            for x in range(self.waitingIndex, len(self.runningStack)):
-                self.io_sys.move_process(self.runningStack[x], x - self.waitingIndex)
-        elif process in self.runningStack:
-            self.waitingIndex -= 1
-            self.runningStack.remove(process)
-            for x in range(self.waitingIndex):
+            for x in range(len(self.runningStack)):
                 self.io_sys.move_process(self.runningStack[x], x)
+        elif process in self.waitingList:
+            self.waitingList.remove(process)
+            for x in range(len(self.waitingList)):
+                self.io_sys.move_process(self.waitingList[x], x)
         self.dispatch_next_process()
 
     def proc_waiting(self, process):
         """Receive notification that process is waiting for input."""
         # ...
-        self.runningStack.remove(process)
+        if process in self.runningStack:
+            self.runningStack.remove(process)
         process.state = State.waiting
-        self.runningStack.insert(0, process)
-        process.iosys.move_process(process, self.runningStack.index(process) - self.waitingIndex)
+        self.waitingList.append(process)
+        process.iosys.move_process(process, self.waitingList.index(process))
         process.process_event.clear()
         self.resume_system()
 
@@ -97,6 +98,9 @@ class Dispatcher():
         """Return the process with the id."""
         # ...
         for process in self.runningStack:
+            if process.id == id:
+                return process
+        for process in self.waitingList:
             if process.id == id:
                 return process
         return None

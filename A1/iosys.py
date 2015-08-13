@@ -100,7 +100,6 @@ class IO_Sys():
         """Gets input from the window associated with 'process'."""
         # change the state of the process to waiting
         self.the_dispatcher.proc_waiting(process)
-        self.the_dispatcher.waitingIndex += 1
         # ...
         process.process_event.wait()
         if process in self.process_buffers:
@@ -110,9 +109,8 @@ class IO_Sys():
                 self.the_dispatcher.proc_finished(process)
             else:    
                 process.state = State.runnable
-        self.the_dispatcher.waitingIndex -= 1
-        #self.the_dispatcher.pause_system()      
-        self.move_process(process,len(self.the_dispatcher.runningStack) - self.the_dispatcher.waitingIndex)
+        self.the_dispatcher.pause_system()      
+        self.move_process(process,len(self.the_dispatcher.runningStack))
         return self.process_buffers[process]  # return the data here
 
 
