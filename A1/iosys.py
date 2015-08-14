@@ -11,6 +11,7 @@ import curses.panel
 WINDOW_HEIGHT = 4
 WINDOW_WIDTH = 40
 
+
 # Only one of these is created and is sent to each process.
 # The processes always print and get input via this.
 
@@ -24,7 +25,7 @@ class IO_Sys():
         """
         self.the_dispatcher = the_dispatcher
         self.panels = panels
-        self.process_buffers = dict()    # each process can have an input buffer
+        self.process_buffers = dict()  # each process can have an input buffer
         self.runnable_window_boxes = []  # the boxes for the runnable process windows
         self.waiting_windows_boxes = []  # the boxes for waiting process windows
         y = 2
@@ -35,7 +36,7 @@ class IO_Sys():
         for i in range(self.the_dispatcher.MAX_PROCESSES):
             self.waiting_windows_boxes.append(Process_Window_Box(y, WINDOW_WIDTH + 2 + 1, self.panels))
             y += WINDOW_HEIGHT + 2
-        self.process_window_box = dict()        # the window box, just for the name
+        self.process_window_box = dict()  # the window box, just for the name
         self.refresh_screen()
 
     def allocate_window_to_process(self, process, tos):
@@ -72,7 +73,7 @@ class IO_Sys():
         """
         if process.state == State.runnable:
             window_box = self.runnable_window_boxes[position]
-        else: # must be waiting
+        else:  # must be waiting
             window_box = self.waiting_windows_boxes[position]
         old_window_box = self.process_window_box.pop(process, None)
         if old_window_box:
@@ -81,7 +82,7 @@ class IO_Sys():
         window_box.set_name(str(process.id))
         new_location = window_box.get_contents_location()
         panel = process.panel
-        panel.move(*new_location) # move the process panel to the new location
+        panel.move(*new_location)  # move the process panel to the new location
         self.refresh_screen()
 
     def write(self, process, data):
@@ -93,17 +94,27 @@ class IO_Sys():
     def fill_buffer(self, process, data):
         """Fill the process buffer with data."""
         # ...
-        self.process_buffers[process] data
-        
+        self.process_buffers[process] = data
 
     def read(self, process):
         """Gets input from the window associated with 'process'."""
         # change the state of the process to waiting
         self.the_dispatcher.proc_waiting(process)
-        process.event.wait()
-        
         # ...
-        return 1# return the data here
+        process.process_event.wait()
+        if process in self.process_buffers:
+            input = int(self.process_buffers[process])        
+            if input < 0:
+                process.state = State.killed
+                self.the_dispatcher.proc_finished(process)
+            else:    
+                process.state = State.runnable
+                self.the_dispatcher.pause_system()
+                self.the_dispatcher.waitingList[self.the_dispatcher.waitingList.index(process)] = None 
+                self.the_dispatcher.runningStack.append(process)                
+        process.iosys.move_process(process, len(self.the_dispatcher.runningStack) - 1)        
+        return self.process_buffers[process]  # return the data here
+
 
 # =======================================================================================================================
 
@@ -128,4 +139,4 @@ class Process_Window_Box():
 
     def get_contents_location(self):
         """Return the (y, x) location of the contents of this window box."""
-        return (self.y+1, self.x+1)
+        return (self.y + 1, self.x + 1)

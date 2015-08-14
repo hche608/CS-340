@@ -11,6 +11,7 @@ import curses.panel
 import re
 from time import sleep
 
+
 def menu(menu_string):
     """Present menu information, receive key from user and process.
 
@@ -29,13 +30,13 @@ def menu(menu_string):
             letter = command[1]
             function = letter + command[3:]
             command_dictionary[letter] = function
-        menu_window.addstr(0, 0, menu_string+":", curses.A_REVERSE)
+        menu_window.addstr(0, 0, menu_string + ":", curses.A_REVERSE)
         refresh_menu()
 
         key = ""
         while key not in command_dictionary:
             key = menu_window.getkey().lower()
-        finished = globals()[command_dictionary[key]]() # call the command, exit this menu if True
+        finished = globals()[command_dictionary[key]]()  # call the command, exit this menu if True
 
 
 def refresh_menu():
@@ -45,10 +46,12 @@ def refresh_menu():
     curses.panel.update_panels()
     curses.doupdate()
 
+
 def new():
     """Get info from user to create a new process."""
     menu("(i)nteractive, (b)ackground, (c)ancel")
     return False
+
 
 def get_process_from_user(request):
     """Return the process corresponding to the number entered by the user."""
@@ -57,22 +60,24 @@ def get_process_from_user(request):
     number = int(menu_window.getstr())
     return the_dispatcher.process_with_id(number)
 
+
 def focus():
     """Get focus process number from the user
     and then hang around until the user has entered
     data to that process.
     """
     process = get_process_from_user("Enter the number of the input process:")
-    process.panel.top() # the top panel has the cursor
+    process.panel.top()  # the top panel has the cursor
     curses.panel.update_panels()
     curses.doupdate()
     input = process.panel.window().getstr()
     # only get here after the user has pressed return
     # put the data in the buffer of the process and wake it up
     # ...
-    io_system.fill_buffer(process,input)
-    process.event.set()
+    io_system.fill_buffer(process, input)
+    process.process_event.set()
     return False
+
 
 def top():
     """Move a runnable process to the top of the stack."""
@@ -81,12 +86,14 @@ def top():
     the_dispatcher.to_top(process)
     return False
 
+
 def kill():
     """Kill the process at the top of the stack."""
     process = get_process_from_user("Enter the number of the process to kill:")
     # ...
     the_dispatcher.proc_finished(process)
     return False
+
 
 def halt():
     """Halt the system for 5 seconds.
@@ -98,6 +105,7 @@ def halt():
     the_dispatcher.resume_system()
     return False
 
+
 def pause():
     """Pause input for 5 seconds.
     This is so that when you watch the system when receiving
@@ -106,10 +114,12 @@ def pause():
     """
     sleep(5)
 
+
 def wait():
     """Wait until all runnable processes have finished."""
     the_dispatcher.wait_until_finished()
     return True
+
 
 def interactive():
     """Create an interactive process."""
@@ -117,19 +127,23 @@ def interactive():
     the_dispatcher.add_process(new_process)
     return True
 
+
 def background():
     """Create a background process."""
     new_process = process.Process(io_system, the_dispatcher, process.Type.background)
     the_dispatcher.add_process(new_process)
     return True
 
+
 def cancel():
     """Cancel the current menu level."""
     return True
 
+
 def quit():
     # the_dispatcher.shut_down()
     return True
+
 
 def main(stdscr):
     global menu_window, menu_panel, io_system, the_dispatcher
@@ -141,9 +155,10 @@ def main(stdscr):
     menu_window.addstr(1, 0, "Stack of runnable processes")
     menu_window.addstr(1, iosys.WINDOW_WIDTH + 3, "Set of waiting processes")
     the_dispatcher = dispatcher.Dispatcher()
-    io_system = iosys.IO_Sys(the_dispatcher, panels) # setup the windows
+    io_system = iosys.IO_Sys(the_dispatcher, panels)  # setup the windows
     the_dispatcher.set_io_sys(io_system)
     menu("(n)ew, (f)ocus, (t)op, (k)ill, (h)alt, (p)ause, (w)ait, (q)uit")
+
 
 curses.wrapper(main)
 print("the end")
