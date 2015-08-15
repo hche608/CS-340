@@ -105,14 +105,13 @@ class IO_Sys():
         if process in self.process_buffers:
             input = int(self.process_buffers[process])        
             if input < 0:
-                process.state = State.killed
                 self.the_dispatcher.proc_finished(process)
             else:    
                 process.state = State.runnable
                 self.the_dispatcher.pause_system()
                 self.the_dispatcher.waitingList[self.the_dispatcher.waitingList.index(process)] = None 
                 self.the_dispatcher.runningStack.append(process)                
-        process.iosys.move_process(process, len(self.the_dispatcher.runningStack) - 1)        
+                process.iosys.move_process(process, len(self.the_dispatcher.runningStack) - 1)        
         return self.process_buffers[process]  # return the data here
 
 

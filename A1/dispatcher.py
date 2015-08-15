@@ -65,11 +65,6 @@ class Dispatcher():
         # ...
         if len(self.runningStack) > 0:
             self.runningStack[len(self.runningStack) - 1].process_event.set()
-        #for x in range(len(self.waitingList)):
-        #    self.io_sys.move_process(self.waitingList[x], x) 
-        #for x in range(len(self.runningStack)):
-        #    self.io_sys.move_process(self.runningStack[x], x)
-        #self.dispatch_next_process()
 
     def wait_until_finished(self):
         """Hang around until all runnable processes are finished."""
@@ -88,9 +83,11 @@ class Dispatcher():
             self.waitingList[self.waitingList.index(process)] = None
         if process in self.runningStack:
             self.runningStack.remove(process)
-        # process.iosys.move_process(process, self.runningStack.index(process))
         for x in range(len(self.runningStack)):
             self.runningStack[x].iosys.move_process(self.runningStack[x], x)
+        #for x in range(len(self.waitingList)):
+        #    if not self.waitingList[x] == None:
+        #        self.runningStack[x].iosys.move_process(self.waitingList[x], x)
         self.resume_system()
         
     def proc_waiting(self, process):
