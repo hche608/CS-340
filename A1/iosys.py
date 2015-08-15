@@ -1,6 +1,7 @@
 # A1 for COMPSCI340/SOFTENG370 2015
 # Prepared by Robert Sheehan
-# Modified by ...
+# Modified by Hao CHEN
+# UPI: 8476927
 
 # You are not allowed to use any sleep calls.
 
@@ -102,17 +103,16 @@ class IO_Sys():
         self.the_dispatcher.proc_waiting(process)
         # ...
         process.process_event.wait()
-        if process in self.process_buffers:
-            input = int(self.process_buffers[process])        
-            if input < 0:
-                self.the_dispatcher.proc_finished(process)
-            else:    
-                process.state = State.runnable
-                self.the_dispatcher.pause_system()
-                self.the_dispatcher.waitingList[self.the_dispatcher.waitingList.index(process)] = None 
-                self.the_dispatcher.runningStack.append(process)                
-                process.iosys.move_process(process, len(self.the_dispatcher.runningStack) - 1)        
-        return self.process_buffers[process]  # return the data here
+        self.the_dispatcher.pause_system()
+        process.state = State.runnable
+        if int(self.process_buffers[process]) >= 0:
+            self.the_dispatcher.waitingList[self.the_dispatcher.waitingList.index(process)] = None 
+            self.the_dispatcher.runningStack.append(process)                
+            process.iosys.move_process(process, len(self.the_dispatcher.runningStack) - 1)
+            return self.process_buffers[process]
+        # negative number   
+        self.the_dispatcher.proc_finished(process)
+        return None  # return the data here
 
 
 # =======================================================================================================================

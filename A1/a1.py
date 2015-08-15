@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # A1 for COMPSCI340/SOFTENG370 2015
 # Prepared by Robert Sheehan
-# Modified by ...
+# Modified by Hao CHEN
+# UPI: 8476927
 
 import dispatcher
 import iosys
@@ -74,6 +75,7 @@ def focus():
     # only get here after the user has pressed return
     # put the data in the buffer of the process and wake it up
     # ...
+
     io_system.fill_buffer(process, input)
     process.process_event.set()
     return False

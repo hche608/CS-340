@@ -1,6 +1,7 @@
 # A1 for COMPSCI340/SOFTENG370 2015
 # Prepared by Robert Sheehan
-# Modified by ...
+# Modified by Hao CHEN
+# UPI: 8476927
 
 # You are not allowed to use any extra sleep calls.
 
