@@ -1,3 +1,7 @@
+# A1 for COMPSCI340/SOFTENG370 2015
+# Prepared by Robert Sheehan
+# Written by Hao CHEN
+# UPI: 8476927
 Q1
     Process    Arrival Time    Burst Time                                             
        P1         0               8                                                   
