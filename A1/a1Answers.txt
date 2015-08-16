@@ -16,6 +16,15 @@ Q1
  ((19 - 1) + (16 - 2) + (8 - 3))/4 = 40/4 = 9.25
  
  Q2
- The process is a user-level thread, 
- 
+ In a real system, a kernel thread (System-level thread) knows multiple threads per process,
+ and each thread can be treadted sparately, but the thread in python is User-Level thread, due to 
+ the global interpreter lock, or GIL, it does not matter how many thread we created, it is only one 
+ user-level thread can switch context with kernel thread, which also means if we block one user-level
+ thread, we block the whole kernel thread. therefore, we do not block the thread in our case, we just
+ change the status of user thread. Alternatively, we are able to get rid of the even when using Python
+ threads, by using multiprocessing, which is is a package that supports spawning processes using an API 
+ similar to the threading module. The multiprocessing package offers both local and remote concurrency, 
+ effectively side-stepping the Global Interpreter Lock by using subprocesses instead of threads. 
+ Due to this, the multiprocessing module allows the programmer to fully leverage multiple processors 
+ on a given machine. It runs on both Unix and Windows. (From Python documents)
  
