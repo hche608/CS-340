@@ -9,9 +9,9 @@ import filecmp
 import shutil
 import sys
 import json
-import record
 import hashlib
 import time
+import manager
 
 IGNORE = ['Thumbs.db', '~', '.', 'json']
 
@@ -47,6 +47,7 @@ def walker(dir_path):
     # traverse root directory, and list directories as dirs and files as files
     for root, dirs, files in os.walk(dir_path):
         print('Current path: %s'% root)
+        files_manager = manager.FileManager(root)
         for name in files:
         # Skip hide files
             if not name.startswith('.') and not name.endswith('~') and not name.endswith('json'):         
@@ -54,12 +55,19 @@ def walker(dir_path):
                 #New File
                 #ctime = time.ctime(os.path.getctime(os.path.join(root, name)))
                 #uid = sha256(os.path.join(root, name))
-                new_record = record.Record(name, time.ctime(os.path.getctime(os.path.join(root, name))), sha256(os.path.join(root, name)))
-                new_record.digest(root, name)
+                #new_record = record.Record(name, time.ctime(os.path.getctime(os.path.join(root, name))), sha256(os.path.join(root, name)))
+                #new_record.digest(root, name)
                 #new_record.digest(new_record.peek())
-                print(new_record.peek())
+                #print(new_record.peek())
         for name in dirs:
             print(os.path.join(root, name))
+
+
+
+
+
+
+
             
 def Main(dir_left, dir_right):
     print('='*50 + '\nStart to sync...' + '\n' + '='*50)

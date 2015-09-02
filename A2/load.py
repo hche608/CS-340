@@ -5,11 +5,18 @@
 
 import os
 import json
+import record
+from pprint import pprint
 
-class Record():
+class Load():
     
-    def __init__(self, fname, ctime, uid):        
-        self.records = [[ctime, uid]]      
+    def __init__(self, fpath, fname):
+        with open(os.path.join(fpath, 'digest')) as data_file:    
+            data = json.load(data_file)
+            data_file.close()
+        pprint(data)     
+        if fname in data:
+            print(data['testOutput.txt'][0][0])  
         
     def peek(self):
         return self.records[0]
@@ -26,7 +33,9 @@ class Record():
         json_obj = dict()
         json_obj[fname] = self.records
         # w+ = overwrite, a+ = append
-        with open(os.path.join(fpath, 'digest'), 'a+') as f:
+        name = '%s.json' % fname
+        with open(os.path.join(fpath, name), 'w+') as f:
             json.dump(json_obj, f)
             f.close() 
-
+if __name__ == '__main__':
+    Load(os.getcwd(),'testOutput.txt')
