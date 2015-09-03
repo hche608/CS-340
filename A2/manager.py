@@ -30,13 +30,13 @@ class FileManager():
                 #pprint(self.local_digest)
             for fname in files:
                 # Skip hide files
-                if not fname.startswith('.') or not fname.endswith('~') or not fname is ('digest'):         
+                if not fname.startswith('.') and not fname.endswith('~') and not fname is ('digest'):         
                     if fname in self.local_digest:
                         tmp_list = self.local_digest[fname]
                         mtime = time.ctime(os.path.getmtime(os.path.join(root, fname)))
                         uid = self.sha256(os.path.join(root, fname))
                         # format = {'file name':[[mtime, uid],[ctime, uid]]}
-                        if not self.exists(uid, tmp_list):
+                        if not self.exists(uid, tmp_list) or not self.exists(mtime, tmp_list):
                             print('Im not in the list\n%s' % uid)
                             tmp_list.insert(0,[mtime, uid])
                             self.local_digest[fname] = tmp_list
