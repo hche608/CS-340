@@ -10,6 +10,8 @@
 import os
 import shutil
 import time
+import json
+from pprint import pprint
 
 def surround_test(message, test):
     print("*" * 40)
@@ -33,7 +35,9 @@ def print_directory(directory, spaces):
 
 def print_file(name):
     with open(name) as file:
-        print(file.read())
+        load_buffer = json.load(file)
+        pprint(load_buffer)
+    file.close()
 
 def remove_all_files():
     shutil.rmtree("dir1", ignore_errors=True)
@@ -102,17 +106,17 @@ def p3():
     os.mkdir("dir1")
     make_file("dir1/file1_1.txt", "Not very exciting really.")
     test_sync()
-    print_file("dir1/.sync")
+    print_file("dir1/digest")
 
 def p4():
     remove_all_files()
     os.mkdir("dir1")
     make_file("dir1/file1_1.txt", "Not very exciting really.")
     test_sync()
-    print_file("dir1/.sync")
+    print_file("dir1/digest")
     append_file("dir1/file1_1.txt", "\nNew data written.")
     test_sync()
-    print_file("dir1/.sync")
+    print_file("dir1/digest")
 
 def p5():
     setup_no_overlap()
