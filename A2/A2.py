@@ -34,17 +34,6 @@ def walker(dir_path):
     for root, dirs, files in os.walk(dir_path):
         print('Current path: %s'% root)
         files_manager = manager.FileManager(root, files)
-        #for name in files:
-        # Skip hide files
-        #    if not name.startswith('.') and not name.endswith('~') and not name.endswith('json'):         
-       #         print('file: %s' % os.path.join(root, name))
-                #New File
-                #ctime = time.ctime(os.path.getctime(os.path.join(root, name)))
-                #uid = sha256(os.path.join(root, name))
-                #new_record = record.Record(name, time.ctime(os.path.getctime(os.path.join(root, name))), sha256(os.path.join(root, name)))
-                #new_record.digest(root, name)
-                #new_record.digest(new_record.peek())
-                #print(new_record.peek())
         for name in dirs:
             print(os.path.join(root, name))
 
@@ -52,13 +41,13 @@ def walker(dir_path):
 def Main(dir_left, dir_right):
     print('='*50 + '\nStart to sync...' + '\n' + '='*50)
     #walker(os.getcwd())
-    #p1 = multiprocessing.Process(target=multiprocessing_scanner.Multiprocessing_scanner.worker,args = (dir_left))
-    #p2 = multiprocessing.Process(target=multiprocessing_scanner.Multiprocessing_scanner.worker,args = (dir_right))
-    #p1.start()
+    p1 = multiprocessing.Process(target=walker(dir_left))
+    #p2 = multiprocessing.Process(target=walker(dir_right))
+    p1.start()
     #p2.start()
-    #p1.join()
+    p1.join()
     #p2.join()
-    walker(dir_left)
+    #walker(dir_left)
     print('\n')
     #walker(dir_right)
     print('\n' + '='*50 + '\nCompleted the sync' + '\n' + '='*50)

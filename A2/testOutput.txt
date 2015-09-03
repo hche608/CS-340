@@ -1,4 +1,4 @@
-robert$ ./test_for_students.py 
+robert$ ./test_for_students.py ??
 ****************************************
 1. This should print an error (or usage) message:
 Usage: sync directory1 directory2
