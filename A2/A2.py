@@ -9,25 +9,11 @@ import filecmp
 import shutil
 import sys
 import json
-import hashlib
-import time
 import manager
+import multiprocessing
+import multiprocessing_scanner
 
 IGNORE = ['Thumbs.db', '~', '.', 'json']
-
-def sha256(fname, blocksize = 65536):
-    hash = hashlib.sha256()
-    with open(fname) as f:
-        for chunk in iter(lambda: f.read(blocksize), ""):
-            hash.update(chunk.encode('utf-8'))
-    return hash.hexdigest()
-
-def md5(fname, blocksize = 65536):
-    hash = hashlib.md5()
-    with open(fname) as f:
-        for chunk in iter(lambda: f.read(blocksize), ""):
-            hash.update(chunk.encode('utf-8'))
-    return hash.hexdigest()   
 
 def sync_files(src, dest, ignore=IGNORE):
     if os.path.isfile(src) or os.path.isfile(dest):
@@ -47,11 +33,11 @@ def walker(dir_path):
     # traverse root directory, and list directories as dirs and files as files
     for root, dirs, files in os.walk(dir_path):
         print('Current path: %s'% root)
-        files_manager = manager.FileManager(root)
-        for name in files:
+        files_manager = manager.FileManager(root, files)
+        #for name in files:
         # Skip hide files
-            if not name.startswith('.') and not name.endswith('~') and not name.endswith('json'):         
-                print('file: %s' % os.path.join(root, name))
+        #    if not name.startswith('.') and not name.endswith('~') and not name.endswith('json'):         
+       #         print('file: %s' % os.path.join(root, name))
                 #New File
                 #ctime = time.ctime(os.path.getctime(os.path.join(root, name)))
                 #uid = sha256(os.path.join(root, name))
@@ -62,19 +48,19 @@ def walker(dir_path):
         for name in dirs:
             print(os.path.join(root, name))
 
-
-
-
-
-
-
             
 def Main(dir_left, dir_right):
     print('='*50 + '\nStart to sync...' + '\n' + '='*50)
     #walker(os.getcwd())
+    #p1 = multiprocessing.Process(target=multiprocessing_scanner.Multiprocessing_scanner.worker,args = (dir_left))
+    #p2 = multiprocessing.Process(target=multiprocessing_scanner.Multiprocessing_scanner.worker,args = (dir_right))
+    #p1.start()
+    #p2.start()
+    #p1.join()
+    #p2.join()
     walker(dir_left)
     print('\n')
-    walker(dir_right)
+    #walker(dir_right)
     print('\n' + '='*50 + '\nCompleted the sync' + '\n' + '='*50)
 
     
