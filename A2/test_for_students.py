@@ -44,7 +44,7 @@ def remove_files(files):
         os.remove(file)
 
 def test_sync():
-    os.system("./sync dir1 dir2")
+    os.system("python3 A2.py dir1 dir2")
 
 def make_file(name, contents):
     with open(name, "w") as file:

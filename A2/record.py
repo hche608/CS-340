@@ -5,28 +5,39 @@
 
 import os
 import json
+import hashlib
+import time
 
 class Record():
     
-    def __init__(self, fname, ctime, uid):        
-        self.records = [[ctime, uid]]      
+    def __init__(self, root, fname):
+        self.records = [[time.ctime(os.path.getctime(os.path.join(root, fname))), self.sha256(os.path.join(root, fname))]]      
         
     def peek(self):
         return self.records[0]
     
-    def insert(self, mtime, uid):
-        self.records.insert(0, [mtime, uid])
-        
-    def exists(self, encode_string):
-        if encode_string in self.records:
-            return true
-        return false
-        
-    def digest(self, fpath, fname):
-        json_obj = dict()
-        json_obj[fname] = self.records
-        # w+ = overwrite, a+ = append
-        with open(os.path.join(fpath, 'digest'), 'a+') as f:
-            json.dump(json_obj, f)
-            f.close() 
+    def insert(self, root, fname):
+        self.records.insert(0, [time.mtime(os.path.getmtime(os.path.join(root, fname))), self.sha256(os.path.join(root, fname))])
 
+    def exists(self, searching_key):
+        return searching_key in [elem for sublist in self.records for elem in sublist]
+        
+    def get_records(self):
+        if len(self.records) > 1:
+            return self.records.sort(key=lambda x: x[1], reverse=True)
+        else:
+            return self.records
+             
+    def sha256(self, fname, blocksize = 65536):
+        hash = hashlib.sha256()
+        with open(fname) as f:
+            for chunk in iter(lambda: f.read(blocksize), ""):
+                hash.update(chunk.encode('utf-8'))
+        return hash.hexdigest()
+        
+    def md5(self, fname, blocksize = 65536):
+        hash = hashlib.md5()
+        with open(fname) as f:
+            for chunk in iter(lambda: f.read(blocksize), ""):
+                hash.update(chunk.encode('utf-8'))
+        return hash.hexdigest() 
