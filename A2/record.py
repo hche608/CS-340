@@ -11,7 +11,9 @@ import time
 class Record():
     
     def __init__(self, root, fname):
-        self.records = [[time.ctime(os.path.getctime(os.path.join(root, fname))), self.sha256(os.path.join(root, fname))]]      
+        ctime = time.strftime("%Y-%m-%d %H:%M:%S %z",time.localtime(os.path.getctime(os.path.join(root, fname))))
+        #self.records = [[time.ctime(os.path.getctime(os.path.join(root, fname))), self.sha256(os.path.join(root, fname))]]      
+        self.records = [[ctime, self.sha256(os.path.join(root, fname))]] 
         
     def peek(self):
         return self.records[0]
