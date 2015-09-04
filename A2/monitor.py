@@ -41,7 +41,8 @@ class Monitor():
     def check_deletion(self, files):        
         for key in self.local_digest.keys():
             if not key in files and not self.local_digest[key][0][1] == 'deleted':
-                mtime = time.strftime('%Y-%m-%d %H:%M:%S %z', time.gmtime())
+                mtime = time.strftime('%Y-%m-%d %H:%M:%S %z', time.localtime(time.time()))
+                #mtime = time.strftime('%Y-%m-%d %H:%M:%S %z', time.gmtime())
                 print('Deletion: %s' % key)
                 tmp_list = self.local_digest[key]
                 tmp_list.insert(0, [mtime, 'deleted'])
