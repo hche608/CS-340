@@ -106,17 +106,17 @@ def p3():
     os.mkdir("dir1")
     make_file("dir1/file1_1.txt", "Not very exciting really.")
     test_sync()
-    print_file("dir1/digest")
+    print_file("dir1/sync")
 
 def p4():
     remove_all_files()
     os.mkdir("dir1")
     make_file("dir1/file1_1.txt", "Not very exciting really.")
     test_sync()
-    print_file("dir1/digest")
+    print_file("dir1/sync")
     append_file("dir1/file1_1.txt", "\nNew data written.")
     test_sync()
-    print_file("dir1/digest")
+    print_file("dir1/sync")
 
 def p5():
     setup_no_overlap()

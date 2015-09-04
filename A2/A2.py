@@ -6,45 +6,48 @@
 import os
 import argparse
 import sys
-import manager
+import monitor
+import ants
 import multiprocessing
 
 #IGNORE = ['Thumbs.db', '~', '.DS_Store', 'digest']
+SYNC = 'sync'
 
-def sync_dir(local_files, remote_sync):
+def mover(local_root, remote_root):
     #dir_cmp = filecmp.dircmp(local_root, remote_root, ignore = IGNORE, hide = None)
     if args.verbose:
-        #print('sync_dir: %s' % dir_cmp.left_list)
-        print('L: %s, R: %s' % (local_files,remote_sync))
+        print('L: %s, R: %s' % (local_root, remote_root))
+    for root, dirs, files in os.walk(local_root):
+        files_worker = ants.Ants(root, files, root.replace(local_root,remote_root), SYNC, args.verbose)
 
 
 def walker(local_root, remote_root):
-    if args.verbose:
-        print('Local Root path: %s'% (local_root))
     # traverse root directory, and list directories as dirs and files as files
     for root, dirs, files in os.walk(local_root):
         if args.verbose:
             print('Current path: %s'% root)
-        files_manager = manager.FileManager(root, files, args.verbose)
-        files_manager.sync_file(root,files,root.replace(local_root,remote_root))
+        files_monitor = monitor.Monitor(root, files, SYNC, args.verbose)
         for name in dirs:
             if not os.path.exists(os.path.join(root.replace(local_root,remote_root), name)):
-                if args.verbose:
-                    print('R-Folder does not exist')
+                # if folder does not exist then create it
                 os.makedirs(os.path.join(root.replace(local_root,remote_root), name))             
 
 def Main(local_path, remote_path):
     if args.verbose:
-        print('='*50 + '\nStart to sync...' + '\n' + '='*50)
+        print('='*50 + '\nScan...' + '\n' + '='*50)
     #walker(os.getcwd())
     p1 = multiprocessing.Process(target=walker(local_path, remote_path))
-    #p2 = multiprocessing.Process(target=walker(dir_right))
+    p2 = multiprocessing.Process(target=walker(remote_path, local_path))
     p1.start()
-    #p2.start()
+    p2.start()
     p1.join()
-    #p2.join()
-    #walker(dir_left)
-    #sync_dir(local_path, remote_path) 
+    p2.join()
+    if args.verbose:
+        print('='*50 + '\nSync...' + '\n' + '='*50)
+    mover(local_path, remote_path) 
+    if args.verbose:
+        print('='*50)
+    mover(remote_path, local_path) 
     if args.verbose:
         print('\n')
     #walker(dir_right)
