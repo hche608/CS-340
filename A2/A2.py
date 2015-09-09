@@ -19,7 +19,7 @@ def mover(local_root, remote_root):
     if args.verbose:
         print('From %s ===> %s.' % (local_root, remote_root))
     for root, dirs, files in os.walk(local_root):
-        files_worker = ants.Ants(root, files, root.replace(local_root,remote_root), SYNC, FORMAT, args.verbose)
+        files_worker = ants.Ants(root, files, root.replace(local_root, remote_root, 1), SYNC, FORMAT, args.verbose)
 
 def update(local_path, remote_path):
     p1 = multiprocessing.Process(target=walker(local_path, remote_path))
@@ -36,10 +36,15 @@ def walker(local_root, remote_root):
         if args.verbose:
             print('Current path: %s'% root)
         files_monitor = monitor.Monitor(root, files, SYNC, FORMAT, args.verbose)
+        if args.verbose:
+            print('dirs: %s'% dirs)
         for name in dirs:
-            if not os.path.exists(os.path.join(root.replace(local_root,remote_root), name)):
+            if not os.path.exists(os.path.join(root.replace(local_root, remote_root, 1), name)):
                 # if folder does not exist then create it
-                os.makedirs(os.path.join(root.replace(local_root,remote_root), name))             
+                os.makedirs(os.path.join(root.replace(local_root, remote_root, 1), name))
+                if args.verbose:
+                    print('Make Folder: %s'% os.path.join(root.replace(local_root, remote_root, 1), name))
+                    print('%s, %s' % (local_root, name))        
 
 def Main(local_path, remote_path):
     if args.verbose:
@@ -47,10 +52,16 @@ def Main(local_path, remote_path):
     update(local_path, remote_path)
     if args.verbose:
         print('='*50 + '\n......Scan Completed' + '\n' + '='*50 + '\n......Sync Files...' + '\n' + '='*50) 
-    mover(local_path, remote_path) 
+    #mover(local_path, remote_path) 
     if args.verbose:
         print('='*50)    
-    mover(remote_path, local_path) 
+    #mover(remote_path, local_path)
+    p1 = multiprocessing.Process(target=mover(local_path, remote_path))
+    p2 = multiprocessing.Process(target=mover(remote_path, local_path))
+    p1.start()
+    p2.start()
+    p1.join()
+    p2.join() 
     if args.verbose:
         print('\n')
     if args.verbose:
