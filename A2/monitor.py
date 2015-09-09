@@ -11,16 +11,16 @@ from pprint import pprint
 
 class Monitor():
     
-    def __init__(self, root, files, sync, verbose = False):
+    def __init__(self, root, files, SYNC, TIME_FORMAT, verbose = False):
+        self.SYNC = SYNC
+        self.TIME_FORMAT = TIME_FORMAT
         self.verbose = verbose
-        self.sync = sync
-        # load digest if it exists and it has data
+        # load digest if it exists or return empty dict()
         self.local_digest = self.load_digest(root)
         for fname in files:
             # Skip hide files
-            if not fname.startswith('.') and not fname.endswith('~') and not fname == self.sync:
-                mtime = time.strftime('%Y-%m-%d %H:%M:%S %z',time.localtime(os.path.getmtime(os.path.join(root, fname))))
-                # mtime = time.ctime(os.path.getmtime(os.path.join(root, fname)))
+            if not fname.startswith('.') and not fname.endswith('~') and not fname == self.SYNC:
+                mtime = time.strftime(self.TIME_FORMAT,time.localtime(os.path.getmtime(os.path.join(root, fname))))
                 uid = self.sha256(os.path.join(root, fname))
                 # Update exist file in sync
                 if self.local_digest and fname in self.local_digest:
@@ -41,9 +41,11 @@ class Monitor():
     def check_deletion(self, files):        
         for key in self.local_digest.keys():
             if not key in files and not self.local_digest[key][0][1] == 'deleted':
-                mtime = time.strftime('%Y-%m-%d %H:%M:%S %z', time.localtime(time.time()))
+                #mtime = time.strftime(self.TIME_FORMAT, time.localtime(time.time()))
+                mtime = time.strftime(self.TIME_FORMAT,)
                 #mtime = time.strftime('%Y-%m-%d %H:%M:%S %z', time.gmtime())
-                print('Deletion: %s' % key)
+                if self.verbose:
+                    print('Deletion: %s' % key)
                 tmp_list = self.local_digest[key]
                 tmp_list.insert(0, [mtime, 'deleted'])
                 self.local_digest[key] = tmp_list    	
@@ -51,17 +53,15 @@ class Monitor():
     def load_digest(self, root):
 		# w+ = overwrite, a+ = append
         load_buffer = dict()
-        if os.path.exists(os.path.join(root, self.sync)) and os.stat(os.path.join(root, self.sync)).st_size > 0:
-            with open(os.path.join(root, self.sync)) as f:
+        if os.path.exists(os.path.join(root, self.SYNC)) and os.stat(os.path.join(root, self.SYNC)).st_size > 0:
+            with open(os.path.join(root, self.SYNC)) as f:
                 load_buffer = json.load(f)
         return load_buffer
 
     def write_digest(self, root, json_obj, verbose = False):
         # w+ = overwrite, a+ = append
         # load or create a sync file
-        if verbose:
-            pprint(json_obj)
-        with open(os.path.join(root, self.sync), 'w+') as f:
+        with open(os.path.join(root, self.SYNC), 'w+') as f:
             json.dump(json_obj, f, indent=4)
     
     def sha256(self, fname, blocksize = 65536):

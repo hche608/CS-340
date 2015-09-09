@@ -10,6 +10,8 @@
 import os
 import shutil
 import time
+import json
+from pprint import pprint
 
 def surround_test(message, test):
     print("*" * 40)
@@ -33,7 +35,9 @@ def print_directory(directory, spaces):
 
 def print_file(name):
     with open(name) as file:
-        print(file.read())
+        load_buffer = json.load(file)
+        pprint(load_buffer)
+    file.close()
 
 def remove_all_files():
     shutil.rmtree("dir1", ignore_errors=True)
@@ -102,17 +106,17 @@ def p3():
     os.mkdir("dir1")
     make_file("dir1/file1_1.txt", "Not very exciting really.")
     test_sync()
-    print_file("dir1/.sync")
+    print_file("dir1/sync")
 
 def p4():
     remove_all_files()
     os.mkdir("dir1")
     make_file("dir1/file1_1.txt", "Not very exciting really.")
     test_sync()
-    print_file("dir1/.sync")
+    print_file("dir1/sync")
     append_file("dir1/file1_1.txt", "\nNew data written.")
     test_sync()
-    print_file("dir1/.sync")
+    print_file("dir1/sync")
 
 def p5():
     setup_no_overlap()
@@ -182,18 +186,18 @@ def p9():
     print_directory('dir2', 0)
 
 # Run different parts of this test program by un/commenting the bits you do/don't want.
-#surround_test("1. This should print an error (or usage) message:", p1)
-#surround_test("2. This should show both dir1 and dir2 as directories:", p2)
-#surround_test("3. This should show sync file contents:", p3)
-#surround_test("4. This should show two different sync files:", p4)
-#surround_test("5. This should show two matching directories:", p5)
-#surround_test("""6. This should show two matching directories
-#   with the file 'a.txt' 75 bytes long
-#   and the modification time > 1 second later:""", p6)
+surround_test("1. This should print an error (or usage) message:", p1)
+surround_test("2. This should show both dir1 and dir2 as directories:", p2)
+surround_test("3. This should show sync file contents:", p3)
+surround_test("4. This should show two different sync files:", p4)
+surround_test("5. This should show two matching directories:", p5)
+surround_test("""6. This should show two matching directories
+   with the file 'a.txt' 75 bytes long
+   and the modification time > 1 second later:""", p6)
 surround_test("""7. This should show two pairs of matching directories
    with the second pair showing different sizes and modification times:""", p7)
-#surround_test("""8. This should show the two directories.
-#   Then they should only contain c.txt.
-#   Then they should have a new version of b.txt:""", p8)
-#surround_test("""9. This starts by showing the initial synchronized directories.
-#   file1_1.txt must be 81 bytes long:""", p9)
+surround_test("""8. This should show the two directories.
+   Then they should only contain c.txt.
+   Then they should have a new version of b.txt:""", p8)
+surround_test("""9. This starts by showing the initial synchronized directories.
+   file1_1.txt must be 81 bytes long:""", p9)
