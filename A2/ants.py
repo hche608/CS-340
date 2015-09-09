@@ -76,8 +76,10 @@ class Ants():
                 print('R Time: ', time.strftime(self.TIME_FORMAT,remote_mtime))
                 print('L > R: ', local_mtime > remote_mtime )
 
-            if local_mtime > remote_mtime and remote_info[fname][0][1] == 'deleted':
-                 result = True
+            #if local_mtime > remote_mtime and remote_info[fname][0][1] == 'deleted':
+            if remote_info[fname][0][1] == 'deleted':
+                if len(local_info[fname]) > 1 and local_info[fname][1][1] == 'deleted':
+                    result = True
             elif local_mtime == remote_mtime and local_uid != remote_uid:
                 if remote_info[fname][0][1] in [j for i in local_info[fname] for j in i]:
                     if self.verbose:
