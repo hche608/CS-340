@@ -53,7 +53,6 @@ class Monitor():
         load_buffer = dict()
         if os.path.exists(os.path.join(root, self.sync)) and os.stat(os.path.join(root, self.sync)).st_size > 0:
             with open(os.path.join(root, self.sync)) as f:
-
                 load_buffer = json.load(f)
         return load_buffer
 

@@ -5,10 +5,10 @@
 
 import os
 import json
-import record
 import time
 import hashlib
 import shutil
+import filecmp
 from pprint import pprint
 
 class Ants():
@@ -19,6 +19,21 @@ class Ants():
         local_data = self.load_digest(local_root)
         remote_data = self.load_digest(remote_root)
         working_list = []
+        
+        # Determine the items that exist in both directories
+        d1_contents = set(os.listdir(local_root))
+        d2_contents = set(os.listdir(remote_root))
+        common = list(d1_contents & d2_contents)
+        common_files = [ f for f in common if os.path.isfile(os.path.join(local_root, f))]
+        print('Common files:', common_files)
+
+        # Compare the directories
+        match, mismatch, errors = filecmp.cmpfiles(local_root, remote_root, common_files,shallow=False)
+        print('Match:', match)
+        print('Mismatch:', mismatch)
+        print('Errors:', errors)
+        
+        
         if bool(remote_data):
             for fname in local_files:
                 if not fname.startswith('.') and not fname.endswith('~') and not fname == self.sync and not self.is_same(fname,local_data,remote_data):
