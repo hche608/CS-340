@@ -1,0 +1,12 @@
+# UPI: hche608
+# Name: Hao CHEN
+
+Q1.
+If this synchronisation implementation cope with a large number of files, and if there are a large number of different files, then the synchronisation implementation will sync all different files which means it will take a lot of time, and it is not efficient, due to some pair of files may just have one line different and this synchronisation implementation will copy the whole file.
+    
+Q2.
+Assumption1,
+If there are two files, which have same file same in the different directories, by using the assumption from the hand-out, we choose the latest modified version and copy it to another directory, which can causes a problem, we should ask user make the decision.
+Assumption2,
+If two files have the same signature, they are the same version. (In reality this may not be the case because the file could have been altered and then changed back to its original state.)
+
