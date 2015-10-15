@@ -8,5 +8,5 @@ Q2.
 Assumption1,
 If there are two files, which have same file same in the different directories, by using the assumption from the hand-out, we choose the latest modified version and copy it to another directory, which can causes a problem, we should ask user make the decision.
 Assumption2,
-If two files have the same signature, they are the same version. (In reality this may not be the case because the file could have been altered and then changed back to its original state.)
+We cannot monitor files in real-time, whcih means we can keep .sync file update, we assume use this app carefully, it may be a case, a file was modified more than once, but only the app is executed then the last modified time of the file would be update to .sync file. Hence, if the file system can notify the app if the file was changed, then the app can update the .sync file. we also need to check if the .sync is valid, the .sync may be casue some problem, the app should able to check it.
 
